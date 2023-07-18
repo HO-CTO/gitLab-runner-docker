@@ -8,4 +8,5 @@ RUN wget https://releases.hashicorp.com/terraform/0.13.6/terraform_0.13.6_linux_
 RUN unzip terraform_0.13.6_linux_amd64.zip && rm terraform_0.13.6_linux_amd64.zip
 RUN mv terraform /usr/bin/terraform
 
+#Check versions of aws and terraform to confirm installed successfully
 RUN aws --version && terraform --version
