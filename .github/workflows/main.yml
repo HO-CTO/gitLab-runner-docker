@@ -1,0 +1,26 @@
+name: 'Main'
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  # Use docker.io for Docker Hub if empty
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  REPO_NAME: ${{ github.event.repository.name }}
+
+
+jobs:
+  container-image:
+    uses: ./.github/workflows/build-container-image.yml
+    with:
+      imageRegistry: ghcr.io
+      imageName: ${{ github.repository }}
+      imageBuildContext: ./gitlab-runner-docker
+      repositoryName: ${{ github.event.repository.name }}
+      user: ho-cto
+      tag: ${{ github.sha }}
+    secrets: inherit
+  
