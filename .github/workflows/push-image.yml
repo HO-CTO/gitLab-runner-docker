@@ -1,7 +1,8 @@
 name: 'Push'
 
 on: 
-  workflow_call
+  pull_request:
+    types: [closed ]
 
 env:
   REGISTRY: ghcr.io
@@ -34,7 +35,7 @@ jobs:
     with:
       imageRegistry: ghcr.io
       imageName: ${{ github.repository }}
-      imageBuildContext: ./monitoring-as-code
+      imageBuildContext: ./
       repositoryName: ${{ github.event.repository.name }}
       user: ho-cto
       tag: ${{needs.calculate-semver.outputs.version}}
