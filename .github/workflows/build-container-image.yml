@@ -31,8 +31,35 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v3
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+      - name: Checkout
+        uses: actions/checkout@v3.5.3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2.8.0
+      - name: Echo meta tags
+        run: echo " ${{ inputs.imageRegistry }}/${{ inputs.imageName }} " 
+      - name: Calculate metadata
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ inputs.imageRegistry }}/${{ inputs.imageName }}
+          tags: |
+            type=raw,value=${{ inputs.tag }}
+            type=raw,value=latest,enable=${{ inputs.tag_latest || false }}
+      - name: Build container
+        uses: docker/build-push-action@v4.1.1
+        with:
+          context: ${{ inputs.imageBuildContext }}
+          file:  ${{ inputs.imageBuildContext }}/Dockerfile
+          push: false
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            PACKAGE_TOKEN=${{ secrets.GITHUB_TOKEN }}
+            VERSION=${{needs.calculate-semver.outputs.version}}
+          outputs: type=docker,dest=/tmp/${{ inputs.repositoryName }}.tar
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3.1.2
+        with:
+          name: ${{ inputs.repositoryName }}
+          path: /tmp/${{ inputs.repositoryName }}.tar
