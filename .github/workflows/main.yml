@@ -23,7 +23,5 @@ jobs:
       user: ho-cto
       tag: ${{ github.sha }}
     secrets: inherit
-    
-  push-image:
-    uses: ./.github/workflows/push-image.yml
+
   
